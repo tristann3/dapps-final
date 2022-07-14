@@ -55,7 +55,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -251,6 +251,8 @@ function App(props) {
 
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider, contractConfig);
+
+
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
@@ -514,7 +516,7 @@ function App(props) {
   const [ipfsContent, setIpfsContent] = useState();
   const [transferToAddresses, setTransferToAddresses] = useState({});
   const [minting, setMinting] = useState(false);
-  const [count, setCount] = useState(1);
+  // const [count, setCount] = useState(1);
 
   // the json for the nfts
   const json = {
@@ -525,17 +527,21 @@ function App(props) {
       name: "Buffalo",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "green",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 42,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "green",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 42,
+        // },
       ],
     },
     2: {
@@ -545,17 +551,21 @@ function App(props) {
       name: "Zebra",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "blue",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 38,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "blue",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 38,
+        // },
       ],
     },
     3: {
@@ -565,17 +575,21 @@ function App(props) {
       name: "Rhino",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "pink",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 22,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "pink",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 22,
+        // },
       ],
     },
     4: {
@@ -585,17 +599,21 @@ function App(props) {
       name: "Fish",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "blue",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 15,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "blue",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 15,
+        // },
       ],
     },
     5: {
@@ -605,17 +623,21 @@ function App(props) {
       name: "Flamingo",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "black",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 6,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "black",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 6,
+        // },
       ],
     },
     6: {
@@ -625,25 +647,37 @@ function App(props) {
       name: "Godzilla",
       attributes: [
         {
-          trait_type: "BackgroundColor",
-          value: "orange",
-        },
-        {
-          trait_type: "Eyes",
-          value: "googly",
-        },
-        {
-          trait_type: "Stamina",
-          value: 99,
-        },
+          trait_type: "Health",
+          value: 5
+        }
+        // {
+        //   trait_type: "BackgroundColor",
+        //   value: "orange",
+        // },
+        // {
+        //   trait_type: "Eyes",
+        //   value: "googly",
+        // },
+        // {
+        //   trait_type: "Stamina",
+        //   value: 99,
+        // },
       ],
     },
   };
 
+  function removeHealth(id) {
+    json[id].attributes[0].value -= 1;
+    console.log("nft id:        " , json[id].attributes[0].value)
+  }
+
   const mintItem = async () => {
     // upload to ipfs
+    const count = 1;
     const uploaded = await ipfs.add(JSON.stringify(json[count]));
-    setCount(count + 1);
+    console.log("COUNT:       ", count)
+    removeHealth(count)
+    // setCount(count + 1);
     console.log("Uploaded Hash: ", uploaded);
     const result = tx(
       writeContracts &&
@@ -757,7 +791,7 @@ function App(props) {
                         <div>
                           <img src={item.image} style={{ maxWidth: 150 }} />
                         </div>
-                        <div>{item.description}</div>
+                        <div>{item.attributes[0].value}</div>
                       </Card>
 
                       <div>
@@ -782,6 +816,11 @@ function App(props) {
                           onClick={() => {
                             console.log("writeContracts", writeContracts);
                             tx(writeContracts.YourCollectible.transferFrom(address, transferToAddresses[id], id));
+                            removeHealth(id); //decrease nft health
+                            
+                            //if health is 0
+                              //remove nft from blockchain
+                            
                           }}
                         >
                           Transfer
