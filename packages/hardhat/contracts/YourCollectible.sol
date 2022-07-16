@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "hardhat/console.sol";
 
 contract YourCollectible is
     ERC721,
@@ -17,6 +18,8 @@ contract YourCollectible is
 
     Counters.Counter private _tokenIdCounter;
 
+    uint256 deployDate;
+
     constructor() ERC721("YourCollectible", "YCB") {}
 
     function _baseURI() internal pure override returns (string memory) {
@@ -24,14 +27,19 @@ contract YourCollectible is
     }
 
     function mintItem(address to, string memory uri) public returns (uint256) {
+        deployDate = block.timestamp;
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         return tokenId;
     }
-
     // The following functions are overrides required by Solidity.
+
+  // Will return `true` if 1 minute has passed since the nft was minted
+    function oneMinuteHasPassed() public view returns (bool) {
+      return (block.timestamp >= (deployDate + 1 minutes));
+    }
 
     function _beforeTokenTransfer(
         address from,

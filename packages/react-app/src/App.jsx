@@ -273,6 +273,8 @@ function App(props) {
   ]);
 
   // keep track of a variable from the contract in the local React state:
+  const tokenId = useContractReader(readContracts, "YourCollectible", "getTokenId", [address]);
+  console.log("TOKEN ID:      ", tokenId)
   const balance = useContractReader(readContracts, "YourCollectible", "balanceOf", [address]);
   console.log("🤗 balance:", balance);
 
@@ -285,6 +287,7 @@ function App(props) {
   //
   const yourBalance = balance && balance.toNumber && balance.toNumber();
   const [yourCollectibles, setYourCollectibles] = useState();
+
 
   useEffect(() => {
     const updateYourCollectibles = async () => {
@@ -519,7 +522,7 @@ function App(props) {
   // const [count, setCount] = useState(1);
 
   // the json for the nfts
-  const json = {
+  var json = {
     1: {
       description: "It's actually a bison?",
       external_url: "https://austingriffith.com/portfolio/paintings/", // <-- this can link to a page for the specific file too
@@ -666,39 +669,41 @@ function App(props) {
     },
   };
 
+  var nft_collection = json
   function removeHealth(id) {
-    json[id].attributes[0].value -= 1;
-    console.log("nft id:        " , json[id].attributes[0].value)
+    nft_collection[id].attributes[0].value -= 1;
   }
 
   const mintItem = async () => {
     // upload to ipfs
     const count = 1;
-    const uploaded = await ipfs.add(JSON.stringify(json[count]));
-    console.log("COUNT:       ", count)
     removeHealth(count)
-    // setCount(count + 1);
-    console.log("Uploaded Hash: ", uploaded);
-    const result = tx(
-      writeContracts &&
-        writeContracts.YourCollectible &&
-        writeContracts.YourCollectible.mintItem(address, uploaded.path),
-      update => {
-        console.log("📡 Transaction Update:", update);
-        if (update && (update.status === "confirmed" || update.status === 1)) {
-          console.log(" 🍾 Transaction " + update.hash + " finished!");
-          console.log(
-            " ⛽️ " +
-              update.gasUsed +
-              "/" +
-              (update.gasLimit || update.gas) +
-              " @ " +
-              parseFloat(update.gasPrice) / 1000000000 +
-              " gwei",
-          );
-        }
-      },
-    );
+    const uploaded = await ipfs.add(JSON.stringify(nft_collection[count]));
+
+    //TODO: retrieve tokenID - DONE
+
+    if (writeContracts.YourCollectible.oneMinuteHasPassed()) {
+      const result = tx(
+        writeContracts &&
+          writeContracts.YourCollectible &&
+          writeContracts.YourCollectible.mintItem(address, uploaded.path),
+        update => {
+          console.log("📡 Transaction Update:", update);
+          if (update && (update.status === "confirmed" || update.status === 1)) {
+            console.log(" 🍾 Transaction " + update.hash + " finished!");
+            console.log(
+              " ⛽️ " +
+                update.gasUsed +
+                "/" +
+                (update.gasLimit || update.gas) +
+                " @ " +
+                parseFloat(update.gasPrice) / 1000000000 +
+                " gwei",
+            );
+          }
+        },
+      );
+    }
   };
 
   return (
